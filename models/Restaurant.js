@@ -2,14 +2,20 @@ const mongoose = require("mongoose");
 
 const restaurantSchema = new mongoose.Schema(
   {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
     name: {
       type: String,
       required: true,
     },
-    address: {
-      type: String,
-      required: true,
-    },
+    address: { type: mongoose.Schema.Types.ObjectId, ref: "Address" },
     phoneNumber: {
       type: String,
       required: true,
@@ -22,10 +28,9 @@ const restaurantSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    menu: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Menu",
-    },
+    menuItems: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "MenuItem", default: [] },
+    ],
   },
   { timestamps: true }
 );
