@@ -19,6 +19,10 @@ const driverSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    phoneNumber: {
+      type: String,
+      required: true,
+    },
     age: {
       type: Number,
       validate: {
