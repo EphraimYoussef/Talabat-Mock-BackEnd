@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const customerSchema = new mongoose.Schema(
   {
@@ -20,6 +21,15 @@ const customerSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+customerSchema.pre("save", async function (next) {
+  if (!this.isModified("password") || this.isNew) {                // * Check if password is modified or new.
+    const salt = await bcrypt.genSalt(10);                         // * Salting the password.
+    const hashedPassword = await bcrypt.hash(this.password, salt); // * Hashing the password.
+    this.password = hashedPassword;                                // * Saving the hashed password.
+    next();
+  }
+});
 
 const Customer = mongoose.model("Customer", customerSchema);
 
