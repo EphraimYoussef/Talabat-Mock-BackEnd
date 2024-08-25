@@ -16,7 +16,9 @@ connectDB();
 
 app.use('/customer', customerRouter);
 app.use('/driver', driverRouter);
-app.use('/restaurant', restaurantRouter);
+
+// TODO : Fix Restaurant Router.
+// app.use('/restaurant', restaurantRouter);
 
 
 app.get('/', (req, res) => {
