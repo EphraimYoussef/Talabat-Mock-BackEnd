@@ -13,13 +13,10 @@ app.use(express.json());
 // TODO : Handle Async Errors.
 connectDB();
 
-
 app.use('/customer', customerRouter);
 app.use('/driver', driverRouter);
 
-// TODO : Fix Restaurant Router.
-// app.use('/restaurant', restaurantRouter);
-
+app.use('/restaurant', restaurantRouter);
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
