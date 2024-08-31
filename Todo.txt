@@ -1,0 +1,52 @@
+Dev
+
+p0 features (can't live without)
+    = Implement login/signup (JWT + Express Validator) ✅
+        - Restaurant
+        - Driver
+        - Customer
+    = Edit restaurant: add address, need to create address layers (R->C->S->R) ✅
+    = Create functionality of creating menus ✅
+    = Create cart/ordering functionality
+        - List (nearby) restaurants [location priority is an extra] ✅
+            = Implement pagination 🟨
+            **GOAL TO FINISH**
+        - Add item to cart
+        - Checkout 
+        - Placing order
+    
+    = Assign order to a driver (WS)
+
+
+p1 features (tackle customer pain)
+    = Customer profile
+        - Past orders
+        - Extra: edit profile (upload profile picture with Multer)
+    = Driver mark order as delivered
+
+p2 features (customer luxury)
+    = Customer-driver chat (WS)
+
+
+Testing
+= Create dummy restaurants (3-4)
+
+
+
+Frontend
+    = Dummy frontend
+    = Utilize AI, Cursor + Claude
+
+
+const [data, setData] = useState({})
+
+const createRestaurant = () {
+    //1. create address if address doesn't exist
+    const address = await axios.post('/api/addresses/');
+    const id = address.id
+    const restaurant = await axios.post('/api/restaurant/);
+    router.push(/restaurant)
+}
+
+
+<button onClick={createRestaurant}>submit</button>
