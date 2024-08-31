@@ -33,7 +33,7 @@ const menuItemSchema = new mongoose.Schema(
 );
 
 menuItemSchema.pre("validate", function (next) {
-  if (!this.originalPrice && this.versions.length === 0) {
+  if (!this.price && this.versions.length === 0) {
     next(new Error("Cannot create item without original price or versions"));
   }
   next();
