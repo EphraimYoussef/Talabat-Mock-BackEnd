@@ -1,27 +1,34 @@
-const express = require('express');
-const config = require('./config/config');
-const connectDB = require('./config/db');
-const customerRouter = require('./routers/CustomerRouter');
-const driverRouter = require('./routers/DriverRouter');
-const restaurantRouter = require('./routers/RestaurantRouter');
+const express = require("express");
+const config = require("./config/config");
+const connectDB = require("./config/db");
+const cors = require("cors");
+const customerRoutes = require("./routers/CustomerRouter");
+const restaurantRoutes = require("./routers/RestaurantRouter");
+const driverRoutes = require("./routers/DriverRouter");
+const addressRoutes = require("./routers/AddressRouter");
 
-
-const app = express();
-const port = config.port;
-app.use(express.json());
-
-// TODO : Handle Async Errors.
+//TODO: handle async connection.
 connectDB();
 
-app.use('/customer', customerRouter);
-app.use('/driver', driverRouter);
+const app = express();
+const port = config.port || 3000;
 
-app.use('/restaurant', restaurantRouter);
+app.use(cors());
 
-app.get('/', (req, res) => {
-    res.send('Hello World!');
-})
+app.use(express.json());
+
+app.use("/api/customers", customerRoutes);
+
+app.use("/api/restaurants", restaurantRoutes);
+
+app.use("/api/drivers", driverRoutes);
+
+app.use("/api/addresses", addressRoutes);
+
+app.get("/", (req, res) => {
+  res.send("Hello, World!");
+});
 
 app.listen(port, () => {
-    console.log(`Listening on port ${port}`);
-})
+  console.log(`Server is running on port ${port}`);
+});
