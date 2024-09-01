@@ -1,4 +1,4 @@
-const driverRepo = require("../repos/driverRepo");
+const driverRepo = require("../repos/DriverRepo");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const config = require("../config/config");

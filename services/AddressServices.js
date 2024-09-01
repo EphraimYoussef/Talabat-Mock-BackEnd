@@ -1,4 +1,4 @@
-const addressRepo = require("../repos/addressRepo");
+const addressRepo = require("../repos/AddressRepo");
 
 const createAddress = async (createAddressDto) => {
   try {

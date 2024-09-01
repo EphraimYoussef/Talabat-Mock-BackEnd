@@ -1,4 +1,4 @@
-const restaurantRepo = require("../repos/restaurantRepo");
+const restaurantRepo = require("../repos/RestaurantRepo");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const config = require("../config/config");

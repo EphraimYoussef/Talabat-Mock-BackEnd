@@ -1,5 +1,5 @@
-const menuItemRepo = require("../repos/menuItemRepo");
-const restaurantRepo = require("../repos/restaurantRepo");
+const menuItemRepo = require("../repos/MenuItemRepo");
+const restaurantRepo = require("../repos/RestaurantRepo");
 
 // Create a new menu item and add it to the restaurant
 const createMenuItem = async (menuItem, restaurantId) => {

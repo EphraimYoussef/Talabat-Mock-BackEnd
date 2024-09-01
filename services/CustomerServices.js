@@ -1,4 +1,4 @@
-const customerRepo = require("../repos/customerRepo");
+const customerRepo = require("../repos/CustomerRepo");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const config = require("../config/config");
