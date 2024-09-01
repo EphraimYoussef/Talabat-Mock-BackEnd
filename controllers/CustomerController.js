@@ -1,33 +1,39 @@
-const customerServices = require('../services/CustomerServices');
-const jsend = require('jsend');
+const customerService = require("../services/CustomerServices");
+const jsend = require("jsend");
+const { validationResult } = require("express-validator");
 
-const signUpCustomer = async (req, res) => {
+const signup = async (req, res) => {
   try {
-    const { firstName, lastName, email, password, phoneNumber } = req.body;
-    const { customer , token } = await customerServices.signUpCustomer(firstName, lastName, email, password, phoneNumber);
-    res.cookie('token', token, { httpOnly: true });
-    res.json(jsend.success( {customer, token } ) );
-    return { customer, token };
-  } 
-  catch (error) {
-    next(error);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const createCustomerDto = req.body;
+    const { customer, token } = await customerService.signup(createCustomerDto);
+    res.send(jsend.success({ customer, token }));
+  } catch (error) {
+    console.log("Error in signup:", error);
+    res.status(500).json({ error: error.message });
   }
-}
+};
 
-const loginCustomer = async (req, res) => {
+const login = async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
     const { email, password } = req.body;
-    const { customer, token } = await customerServices.loginCustomer(email, password);
-    res.cookie('token', token, { httpOnly: true });
-    res.json(jsend.success(customer, token ,'Customer logged in successfully'));
-    return { customer, token };
+    const { customer, token } = await customerService.login(email, password);
+    res.send(jsend.success({ customer, token }));
   } 
   catch (error) {
-    next(error);
+    console.log("Error in login:", error);
+    res.status(500).json({ error: error.message });
   }
-}
+};
 
 module.exports = {
-  signUpCustomer,
-  loginCustomer
-}
+  signup,
+  login,
+};
