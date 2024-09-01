@@ -35,15 +35,6 @@ const restaurantSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-restaurantSchema.pre("save", async function (next) {
-  if (!this.isModified("password") || this.isNew) {                // * Check if password is modified or new.
-    const salt = await bcrypt.genSalt(10);                         // * Salting the password.
-    const hashedPassword = await bcrypt.hash(this.password, salt); // * Hashing the password.
-    this.password = hashedPassword;                                // * Saving the hashed password.
-    next();
-  }
-})
-
 const Restaurant = mongoose.model("Restaurant", restaurantSchema);
 
 module.exports = Restaurant;
