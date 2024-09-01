@@ -1,22 +1,32 @@
-const { body } = require('express-validator');
+const { body } = require("express-validator");
 
-const driverSignupValidator = [
-  body('firstName' , 'First Name is required').isString(),
-  body('lastName' , 'Last Name is required').isString(),
-  body('email' , 'Email is required').isEmail(),
-  body('password' , 'Password is required').isString().isLength( { min: 8 } ),
-  body('phoneNumber' , 'Phone Number is required to be in Egyptian format').isMobilePhone("ar-EG"),
-  body('age' , 'Age is required').isInt({ min: 18, max: 65 }),
-  body('vehicle' , 'Vehicle is required').isIn(["car", "motorcycle", "bicycle", "on_foot"]),
-  body('nationalId' , 'National ID is required').isString().isLength( { min: 14, max: 14 } ),
+const createDriver = [
+  body("email")
+    .isEmail()
+    .withMessage("Please enter a valid email address")
+    .normalizeEmail(),
+  body("password")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long"),
+  body("firstName").notEmpty().withMessage("First name is required").trim(),
+  body("lastName").notEmpty().withMessage("Last name is required").trim(),
+  body("age")
+    .isInt({ min: 18, max: 65 })
+    .withMessage("Age must be between 18 and 65"),
+  body("vehicle")
+    .isIn(["car", "motorcycle", "bicycle", "on_foot"])
+    .withMessage("Invalid vehicle type"),
+  body("nationalId")
+    .matches(/^\d{14}$/)
+    .withMessage("National ID must be 14 digits"),
 ];
 
-const driverLoginValidator = [
-  body('email' , 'Email is required').isEmail(),
-  body('password' , 'Password is required').isString().isLength( { min: 8 } ),
+const loginDriver = [
+  body("email")
+    .isEmail()
+    .withMessage("Please enter a valid email address")
+    .normalizeEmail(),
+  body("password").notEmpty().withMessage("Password is required"),
 ];
 
-module.exports = {
-  driverSignupValidator,
-  driverLoginValidator
-}
+module.exports = { createDriver, loginDriver };

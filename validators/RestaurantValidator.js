@@ -1,23 +1,39 @@
-const { body } = require('express-validator');
+const { body } = require("express-validator");
 
-const restaurantSignupValidator = [
-  body('name' , 'Name is required').isString(),
-  body('owner' , 'Owner is required').isString(),
-  body('email' , 'Email is required').isEmail(),
-  body('password' , 'Password is required').isString().isLength( { min: 8 } ),
-  body('phoneNumber' , 'Phone Number is required to be in Egyptian format').isMobilePhone("ar-EG"),
-  body('category' , 'Category is required').isArray().isLength( { min: 1 } ),
-  body('menuItems' , 'Menu Items is required').isArray().isLength( { min: 1 } ),
-  body('address' , 'Address is required').isString(),
-  body('cordinates' , 'Cordinates is required').isArray().isLength( { min: 2 , max: 2 } ),
+const signupValidators = [
+  body("email")
+    .isEmail()
+    .withMessage("Please enter a valid email address")
+    .normalizeEmail(),
+  body("password")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long"),
+  body("name").notEmpty().withMessage("Restaurant name is required").trim(),
+  body("phoneNumber")
+    .isMobilePhone("ar-EG")
+    .withMessage("Please enter a valid phone number"),
+  body("category")
+    .isArray({ min: 1 })
+    .withMessage("At least one category is required"),
+  body("owner").notEmpty().withMessage("Owner name is required").trim(),
+  body("address").notEmpty().withMessage("Address is required"),
 ];
 
-const restaurantLoginValidator = [
-  body('email' , 'Email is required').isEmail(),
-  body('password' , 'Password is required').isString().isLength( { min: 8 } ),
+const loginValidators = [
+  body("email")
+    .isEmail()
+    .withMessage("Please enter a valid email address")
+    .normalizeEmail(),
+  body("password").notEmpty().withMessage("Password is required"),
+];
+
+const createMenuItemValidators = [
+  body("name").notEmpty().withMessage("Name is required").trim(),
+  body("description").notEmpty().withMessage("Description is required").trim(),
 ];
 
 module.exports = {
-  restaurantSignupValidator,
-  restaurantLoginValidator
-}
+  signupValidators,
+  loginValidators,
+  createMenuItemValidators,
+};

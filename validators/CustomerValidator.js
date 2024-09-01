@@ -1,23 +1,41 @@
-const { body } = require('express-validator');
+const validator = require("express-validator");
 
-const customerSignupValidator = [
-  body('firstName' , 'First Name is required').isString(),
-  body('lastName' , 'Last Name is required').isString(),
-  body('email' , 'Email is required').isEmail(),
-  body('password' , 'Password is required').isString().isLength( { min: 8 } ),
-  body('phoneNumber' , 'Phone Number is required to be in Egyptian format').isMobilePhone("ar-EG"),
-  body('sex' , 'Sex is required').isIn(["male", "female"]),
-  body('profilePictureURL' , 'Profile Picture URL must be a valid URL').isURL(),
-  body('addresses' , 'Addresses is required').isArray().isLength( { min: 1 } ),
-  body('cordinates' , 'Coordinates is required').isArray().isLength( { min: 2 , max: 2 } ),
+const createCustomer = [
+  validator.body("firstName").isString().withMessage("FirstName is required"),
+  validator.body("lastName").isString().withMessage("LastName is required"),
+  validator.body("email").isEmail().withMessage("Email is required"),
+  validator
+    .body("password")
+    .isString()
+    .isLength({ min: 8 })
+    .withMessage("Password is required"),
+  validator
+    .body("phoneNumber")
+    .isMobilePhone("ar-EG")
+    .withMessage("Phone is required to be in the correct format (Egypt Code)"),
+  validator.body("addressString").isString().withMessage("Address is required"),
+  validator
+    .body("coordiantes")
+    .isArray()
+    .withMessage("Coordiantes is required"),
+  validator
+    .body("sex")
+    .isIn(["male", "female"])
+    .withMessage("Sex must be either 'male', 'female'"),
+  validator
+    .body("profilePictureURL")
+    .optional()
+    .isURL()
+    .withMessage("Profile picture URL must be a valid URL if provided"),
 ];
 
-const customerLoginValidator = [
-  body('email' , 'Email is required').isEmail(),
-  body('password' , 'Password is required').isString().isLength( { min: 8 } ),
+const loginCustomer = [
+  validator.body("email").isEmail().withMessage("Email is required"),
+  validator
+    .body("password")
+    .isString()
+    .isLength({ min: 8 })
+    .withMessage("Password is required"),
 ];
 
-module.exports = {
-  customerSignupValidator,
-  customerLoginValidator
-}
+module.exports = { createCustomer, loginCustomer };
