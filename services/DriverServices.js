@@ -1,60 +1,40 @@
-const DriverRepo = require("../repos/DriverRepo");
-const jwt = require("jsonwebtoken");
+const driverRepo = require("../repos/driverRepo");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const config = require("../config/config");
-const UnauthorizedError = require("../common/errors/UnauthorizedError");
 
-const signUpDriver = async (firstName, lastName, email, password, phoneNumber, age, vehicle, nationalId) => {
-  try {
-    const token = jwt.sign(
-      {firstName, lastName, email, password, phoneNumber, age, vehicle, nationalId},
-      config.jwt.secret, 
-      {expiresIn: config.jwt.expiresIn}
-    )
-    const driver = await DriverRepo.createDriver(
-      firstName, 
-      lastName, 
-      email, 
-      password, 
-      phoneNumber, 
-      age, 
-      vehicle, 
-      nationalId
-    );
-    return { driver, token };
-  } 
-  catch (error) {
-    throw error;
-  }
-}
+const signup = async (createDriverDto) => {
+  const hashedPassword = await bcrypt.hash(createDriverDto.password, 10);
+  const driver = await driverRepo.createDriver({
+    ...createDriverDto,
+    password: hashedPassword,
+  });
+  const token = jwt.sign(
+    { id: driver._id, type: "driver" },
+    config.jwt.secret,
+    {
+      expiresIn: config.jwt.expiration,
+    }
+  );
+  return { driver, token };
+};
 
-const loginDriver = async (email, password) => {
-  try {
-    const driver = await DriverRepo.getDriverByEmail(email);
-    if (driver){
-      const isMatch = await bcrypt.compare(password, driver.password);
-      if (isMatch) {
-        const token = jwt.sign(
-          { email: driver.email },
-          config.jwt.secret, 
-          { expiresIn: config.jwt.expiresIn }
-        );
-        return { driver, token };
-      }
-      else {
-        throw new UnauthorizedError("Invalid email or password");
-      }
-    }
-    else{
-      throw new UnauthorizedError("Invalid email or password");
-    }
-  } 
-  catch (error) {
-    throw error;
+const login = async (email, password) => {
+  const driver = await driverRepo.getDriverByEmail(email);
+  if (!driver) {
+    throw new Error("Invalid credentials");
   }
-}
+  const isPasswordValid = await bcrypt.compare(password, driver.password);
+  if (!isPasswordValid) {
+    throw new Error("Invalid credentials");
+  }
+  const token = jwt.sign({ id: driver._id }, config.jwt.secret, {
+    expiresIn: config.jwt.expiration,
+  });
+  return { driver, token };
+};
 
 module.exports = {
-  signUpDriver,
-  loginDriver
-}
+  signup,
+  login,
+};

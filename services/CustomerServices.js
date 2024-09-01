@@ -1,51 +1,46 @@
-const customerRepo = require("../repos/CustomerRepo");
+const customerRepo = require("../repos/customerRepo");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const config = require("../config/config");
-const UnauthorizedError = require("../common/errors/UnauthorizedError");
 
-const signUpCustomer = async (firstName, lastName, email, password, phoneNumber) => {
+const signup = async (createCustomerDto) => {
   try {
+    const { password } = createCustomerDto;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    createCustomerDto.password = hashedPassword;
+    const customer = await customerRepo.createCustomer(createCustomerDto);
     const token = jwt.sign(
-      {firstName, lastName, email, password, phoneNumber},
-      config.jwt.secret, 
-      {expiresIn: config.jwt.expiresIn}
+      { id: customer._id, type: "customer" },
+      config.jwt.secret
     );
-    const customer = await customerRepo.createCustomer(firstName, lastName, email, password, phoneNumber);
+    return { customer, token };
+  } 
+  catch (error) {
+    console.error("Error in signup:", error);
+    throw error;
+  }
+};
+
+const login = async (email, password) => {
+  try {
+    const customer = await customerRepo.getCustomerByEmail(email);
+    if (!customer) {
+      throw new Error("Customer not found");
+    }
+    const isPasswordCorrect = await bcrypt.compare(password, customer.password);
+    if (!isPasswordCorrect) {
+      throw new Error("Invalid password");
+    }
+    const token = jwt.sign({ id: customer._id }, config.jwt.secret);
     return { customer, token };
   }
   catch (error) {
+    console.error("Error in login:", error);
     throw error;
   }
-}
-
-const loginCustomer = async (email, password) => {
-  try {
-    const customer = await customerRepo.getCustomerByEmail(email);
-    if (customer){
-      const isMatch = await bcrypt.compare(password, customer.password);
-      if (isMatch) {
-        const token = jwt.sign(
-          { email: customer.email},
-          config.jwt.secret, 
-          { expiresIn: config.jwt.expiresIn }
-        );
-        return { customer, token };
-      }
-      else {
-        throw new UnauthorizedError("Invalid email or password");
-      }
-    }
-    else{
-      throw new UnauthorizedError("Invalid email or password");
-    }
-  }
-  catch (error) {
-    throw error;
-  }
-}
+};
 
 module.exports = {
-  signUpCustomer,
-  loginCustomer
-}
+  signup,
+  login,
+};

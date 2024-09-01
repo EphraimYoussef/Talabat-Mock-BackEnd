@@ -1,60 +1,59 @@
-const RestaurantRepo = require("../repos/RestaurantRepo");
-const jwt = require("jsonwebtoken");
+const restaurantRepo = require("../repos/restaurantRepo");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const config = require("../config/config");
-const UnauthorizedError = require("../common/errors/UnauthorizedError");
 
+const signup = async (createRestaurantDto) => {
+  const hashedPassword = await bcrypt.hash(createRestaurantDto.password, 10);
+  const restaurantToCreate = {
+    ...createRestaurantDto,
+    password: hashedPassword,
+  };
+  const restaurant = await restaurantRepo.createRestaurant(restaurantToCreate);
+  const token = jwt.sign(
+    { id: restaurant._id, type: "restaurant" },
+    config.jwt.secret,
+    {
+      expiresIn: config.jwt.expiration,
+    }
+  );
+  return { restaurant, token };
+};
 
-const signUpRestaurant = async (email, password, name, address, phoneNumber, category, owner) => {
-	try {
-		const token = jwt.sign(
-			{email, password, name, address, phoneNumber, category, owner},
-			config.jwt.secret, 
-			{expiresIn: config.jwt.expiresIn}
-		)
-		const restaurant = await RestaurantRepo.createRestaurant(
-			email, 
-			password, 
-			name, 
-			address, 
-			phoneNumber, 
-			category, 
-			owner
-		);
-		return { restaurant, token };
-	} 
+const login = async (email, password) => {
+  const restaurant = await restaurantRepo.getRestaurantByEmail(email);
+  if (!restaurant) {
+    throw new Error("Invalid credentials");
+  }
+  const isPasswordValid = await bcrypt.compare(password, restaurant.password);
+  if (!isPasswordValid) {
+    throw new Error("Invalid credentials");
+  }
+  const token = jwt.sign({ id: restaurant._id }, config.jwt.secret, {
+    expiresIn: config.jwt.expiration,
+  });
+  return { restaurant, token };
+};
+
+const getAllRestaurants = async () => {
+  try {
+    const restaurants = await restaurantRepo.getAllRestaurants();
+    return restaurants;
+  } 
 	catch (error) {
-		throw error;
-	}
-}
+    console.error("Error fetching all restaurants:", error);
+    throw new Error("Failed to fetch restaurants");
+  }
+};
 
-const loginRestaurant = async (email, password) => {
-	try {
-		const restaurant = await RestaurantRepo.getRestaurantByEmail(email);
-		if (restaurant){
-			const isMatch = await bcrypt.compare(password, restaurant.password);
-			if (isMatch) {
-				const token = jwt.sign(
-					{ email: restaurant.email},
-					config.jwt.secret, 
-					{ expiresIn: config.jwt.expiresIn }
-				);
-				return { restaurant, token };
-			}
-			else {
-				throw new UnauthorizedError("Invalid email or password");
-			}
-		}
-		else{
-			throw new UnauthorizedError("Invalid email or password");
-		}
-	} 
-	catch (error) {
-		throw error;
-	}
-}
+const getRestaurantById = async (id) => {
+  const restaurant = await restaurantRepo.getRestaurantById(id);
+  return restaurant;
+};
 
 module.exports = {
-	signUpRestaurant,
-	loginRestaurant
-}
+  signup,
+  login,
+  getAllRestaurants,
+  getRestaurantById,
+};
