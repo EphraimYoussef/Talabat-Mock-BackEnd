@@ -1,9 +1,28 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { signUpRestaurant, loginRestaurant } = require('../controllers/RestaurantController');
-const { restaurantSignupValidator, restaurantLoginValidator } = require('../validators/RestaurantValidator');
+const restaurantController = require("../controllers/RestaurantController");
+const restaurantValidators = require("../validators/RestaurantValidator");
+const { restaurantAuth } = require("../middlewares/auth");
 
-router.post('/signup', restaurantSignupValidator, signUpRestaurant);
-router.post('/login', restaurantLoginValidator, loginRestaurant);
+router.post(
+  "/signup",
+  restaurantValidators.signupValidators,
+  restaurantController.signup
+);
 
-module.exports = router
+router.post(
+  "/login",
+  restaurantValidators.loginValidators,
+  restaurantController.login
+);
+
+router.get("/", restaurantController.getAllRestaurants);
+
+router.post(
+  "/menu-item",
+  restaurantAuth,
+  restaurantValidators.createMenuItemValidators,
+  restaurantController.createMenuItem
+);
+
+module.exports = router;

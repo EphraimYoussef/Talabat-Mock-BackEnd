@@ -1,9 +1,18 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const {signUpCustomer, loginCustomer} = require('../controllers/CustomerController');
-const { customerSignupValidator, customerLoginValidator } = require('../validators/CustomerValidator');
+const customerController = require("../controllers/CustomerController");
+const customerValidators = require("../validators/CustomerValidator");
 
-router.post('/signup', customerSignupValidator, signUpCustomer);
-router.post('/login', customerLoginValidator,   loginCustomer);
+router.post(
+  "/signup",
+  customerValidators.createCustomer,
+  customerController.signup
+);
 
-module.exports = router
+router.post(
+  "/login",
+  customerValidators.loginCustomer,
+  customerController.login
+);
+
+module.exports = router;

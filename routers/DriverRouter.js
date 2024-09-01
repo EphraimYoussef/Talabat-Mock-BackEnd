@@ -1,9 +1,10 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const {signUpDriver, loginDriver} = require('../controllers/DriverController');
-const { driverSignupValidator, driverLoginValidator } = require('../validators/DriverValidator');
+const driverController = require("../controllers/DriverController");
+const driverValidators = require("../validators/DriverValidator");
 
-router.post('/signup', driverSignupValidator, signUpDriver);
-router.post('/login', driverLoginValidator, loginDriver);
+router.post("/signup", driverValidators.createDriver, driverController.signup);
 
-module.exports = router
+router.post("/login", driverValidators.loginDriver, driverController.login);
+
+module.exports = router;
